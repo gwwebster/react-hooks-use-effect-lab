@@ -1,12 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function Question({ question, onAnswered }) {
   const [timeRemaining, setTimeRemaining] = useState(10);
+  // add to component scope so you can clear timeout within handleAnswer
+  const timeoutId = setTimeout(() => setTimeRemaining(timeRemaining => timeRemaining - 1), 1000);
 
-  // add useEffect code
+  // useEffect
+  useEffect(() => {
+    if (timeRemaining === 0) {
+      setTimeRemaining(10)
+      onAnswered(false)
+      clearTimeout(timeoutId)
+    }
+   
+    // cleanup function -- only runs when component is unmounted
+    return function cleanup() {
+      clearTimeout(timeoutId)
+    }
+  }, [question, onAnswered, timeRemaining, timeoutId]);
+
 
   function handleAnswer(isCorrect) {
     setTimeRemaining(10);
+    clearTimeout(timeoutId)
     onAnswered(isCorrect);
   }
 
